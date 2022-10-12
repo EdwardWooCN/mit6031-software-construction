@@ -29,10 +29,10 @@ public class Extract {
             if (Objects.isNull(tweet.getTimestamp())) {
                 continue;
             }
-            if (Objects.isNull(startInstant) || tweet.getTimestamp().compareTo(startInstant) < 0) {
+            if (Objects.isNull(startInstant) || tweet.getTimestamp().isBefore(startInstant)) {
                 startInstant = tweet.getTimestamp();
             }
-            if (Objects.isNull(endInstant) || tweet.getTimestamp().compareTo(endInstant) > 0) {
+            if (Objects.isNull(endInstant) || tweet.getTimestamp().isAfter(endInstant)) {
                 endInstant = tweet.getTimestamp();
             }
         }
@@ -65,7 +65,7 @@ public class Extract {
         return result;
     }
 
-    public static Set<String> getMentionUsersFromText(String text) {
+    private static Set<String> getMentionUsersFromText(String text) {
         Set<String> result = new HashSet<>();
         if (Objects.isNull(text)) {
             return result;

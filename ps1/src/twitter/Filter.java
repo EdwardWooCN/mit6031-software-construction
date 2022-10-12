@@ -3,7 +3,12 @@
  */
 package twitter;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Filter consists of methods that filter a list of tweets for those matching a
@@ -27,7 +32,17 @@ public class Filter {
      *         in the same order as in the input list.
      */
     public static List<Tweet> writtenBy(List<Tweet> tweets, String username) {
-        throw new RuntimeException("not implemented");
+        if (!validUserName(username)) {
+            return new ArrayList<>();
+        }
+        return tweets.stream()
+                .filter(tweet -> username.equals(tweet.getAuthor()))
+                .collect(Collectors.toList());
+    }
+
+    private static boolean validUserName(String username) {
+        //should be implemented in reality
+        return true;
     }
 
     /**
@@ -41,7 +56,10 @@ public class Filter {
      *         in the same order as in the input list.
      */
     public static List<Tweet> inTimespan(List<Tweet> tweets, Timespan timespan) {
-        throw new RuntimeException("not implemented");
+        return tweets.stream()
+                .filter(tweet -> timespan.getStart().isBefore(tweet.getTimestamp())
+                        && timespan.getEnd().isAfter(tweet.getTimestamp()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -60,7 +78,12 @@ public class Filter {
      *         same order as in the input list.
      */
     public static List<Tweet> containing(List<Tweet> tweets, List<String> words) {
-        throw new RuntimeException("not implemented");
+        return tweets.stream()
+                .filter(tweet -> textContainsWords(tweet.getText(), words))
+                .collect(Collectors.toList());
     }
 
+    private static boolean textContainsWords(String text, List<String> words) {
+        return words.stream().anyMatch(word -> Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE).matcher(text).find());
+    }
 }

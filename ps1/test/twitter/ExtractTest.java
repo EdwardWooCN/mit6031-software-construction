@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
@@ -124,7 +125,8 @@ public class ExtractTest {
     public void oneTweetAndMentionGetMentionedUsersTest() {
         Set<String> mentionedUsers = Extract.getMentionedUsers(Arrays.asList(tweet6));
 
-        assertTrue("expected non-empty set", !mentionedUsers.isEmpty());
+        assertFalse("expected non-empty set", mentionedUsers.isEmpty());
+        assertTrue("expected same user", new HashSet<>(Arrays.asList("haha", "HAHA")).containsAll(mentionedUsers));
     }
 
     // This test covers list.length()=1, not mention && contains email address
@@ -148,7 +150,8 @@ public class ExtractTest {
     public void manyTweetAndMentionGetMentionedUsersTest() {
         Set<String> mentionedUsers = Extract.getMentionedUsers(Arrays.asList(tweet6, tweet1));
 
-        assertTrue("expected non-empty set", !mentionedUsers.isEmpty());
+        assertFalse("expected non-empty set", mentionedUsers.isEmpty());
+        assertTrue("expected same user", new HashSet<>(Arrays.asList("haha", "HAHA")).containsAll(mentionedUsers));
     }
 
     // This test covers list.length()=1, not mention && contains email address
