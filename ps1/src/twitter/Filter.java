@@ -36,7 +36,7 @@ public class Filter {
             return new ArrayList<>();
         }
         return tweets.stream()
-                .filter(tweet -> username.equals(tweet.getAuthor()))
+                .filter(tweet -> username.equalsIgnoreCase(tweet.getAuthor()))
                 .collect(Collectors.toList());
     }
 

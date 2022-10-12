@@ -59,7 +59,7 @@ public class FilterTest {
     //this test covers result.length()>1
     @Test
     public void testWrittenByMultipleTweetsMultipleResult() {
-        List<Tweet> writtenBy = Filter.writtenBy(Arrays.asList(tweet1, tweet3), "alyssa");
+        List<Tweet> writtenBy = Filter.writtenBy(Arrays.asList(tweet1, tweet3), "Alyssa");
 
         assertEquals("expected size=2 list", 2, writtenBy.size());
         assertTrue("expected list to contain tweet", writtenBy.containsAll(Arrays.asList(tweet1, tweet3)));
