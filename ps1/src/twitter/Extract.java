@@ -77,6 +77,7 @@ public class Extract {
             if (segmentSplitByAt.length == 2 && segmentSplitByAt[0].length() == 0) {
                 String unprunedUserName = segmentSplitByAt[1];
                 String[] splitedUserName = unprunedUserName.split("([^a-zA-Z0-9-_]+)", 2);
+                //log
 //                if (splitedUserName.length>1 && splitedUserName[1].length()>1) {
 //                    System.out.println("unexpected suffix: text=" + text + " , splitedUserName=" + Arrays.toString(splitedUserName));
 //                }
