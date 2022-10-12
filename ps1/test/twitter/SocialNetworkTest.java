@@ -84,15 +84,18 @@ public class SocialNetworkTest {
         followsGraph.put("user2", new HashSet<>(Arrays.asList("mentioned1", "mentioned2")));
         followsGraph.put("user3", new HashSet<>(Arrays.asList("mentioned3", "mentioned4")));
         followsGraph.put("user4", new HashSet<>(Arrays.asList("mentioned1", "mentioned2", "mentioned3", "mentioned4")));
-        followsGraph.put("user5", new HashSet<>(Arrays.asList("mentioned3", "mentioned1", "mentioned2")));
+        followsGraph.put("user5", new HashSet<>(Arrays.asList("mentioned3", "mentioned1", "mentioned5")));
+        followsGraph.put("user6", new HashSet<>(Arrays.asList("mentioned1", "mentioned3", "mentioned2")));
         List<String> influencers = SocialNetwork.influencers(followsGraph);
 
+        System.out.println(influencers.toString());
+
         assertFalse("expected non-empty list", influencers.isEmpty());
-        assertEquals("expected in order list", 0, influencers.indexOf("user4"));
-        assertEquals("expected in order list", 1, influencers.indexOf("user5"));
-//        assertEquals("expected in order list", 2, influencers.indexOf("user2"));
-//        assertEquals("expected in order list", 3, influencers.indexOf("user3"));
-        assertEquals("expected in order list", 4, influencers.indexOf("user1"));
+        assertEquals("expected in order list", 0, influencers.indexOf("mentioned1"));//size=5
+        assertEquals("expected in order list", 1, influencers.indexOf("mentioned3"));// size=4
+        assertEquals("expected in order list", 2, influencers.indexOf("mentioned2"));// size=3
+        assertEquals("expected in order list", 3, influencers.indexOf("mentioned4"));// size=2
+        assertEquals("expected in order list", 4, influencers.indexOf("mentioned5"));// size=1
     }
 
     /*

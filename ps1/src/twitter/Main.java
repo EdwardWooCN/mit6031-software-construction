@@ -68,6 +68,7 @@ public class Main {
         final int count = 10;
         final List<String> influencers = SocialNetwork.influencers(followsGraph);
         for (String username : influencers.subList(0, Math.min(count, influencers.size()))) {
+//            System.out.println(String.format("username=%s, mentionedUsers.size=%d", username, followsGraph.get(username).size()));
             System.out.println(username);
         }
     }

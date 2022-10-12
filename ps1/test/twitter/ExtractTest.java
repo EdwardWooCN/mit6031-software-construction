@@ -32,6 +32,7 @@ public class ExtractTest {
     private static final Tweet tweet5 = new Tweet(5, "bbitdiddle", "rivest talk in sfdjk@mit.edu.cn 30 minutes #hype", d2);
     private static final Tweet tweet6 = new Tweet(6, "skdjfal", "I like @haha and @HAHA", d2);
     private static final Tweet tweet7 = new Tweet(7, "skdjfal", "I like @haha and @Hellen", d2);
+    private static final Tweet tweet8 = new Tweet(8, "unex", "RT @Ekitipikin: We got lots of ", d3);
 
     @Test(expected=AssertionError.class)
     public void testAssertionsEnabled() {
@@ -169,5 +170,13 @@ public class ExtractTest {
         Set<String> mentionedUsers = Extract.getMentionedUsers(Arrays.asList(tweet4, tweet2, tweet3));
 
         assertTrue("expected empty set", mentionedUsers.isEmpty());
+    }
+
+    // This test covers username with unwanted suffix
+    @Test
+    public void unwantedSuffixGetMentionedUsersTest() {
+        Set<String> mentionedUsers = Extract.getMentionedUsers(Arrays.asList(tweet8));
+
+        assertTrue(mentionedUsers.contains("ekitipikin"));
     }
 }
