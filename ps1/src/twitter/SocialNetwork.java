@@ -3,9 +3,8 @@
  */
 package twitter;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * SocialNetwork provides methods that operate on a social network.
@@ -41,7 +40,15 @@ public class SocialNetwork {
      *         either authors or @-mentions in the list of tweets.
      */
     public static Map<String, Set<String>> guessFollowsGraph(List<Tweet> tweets) {
-        throw new RuntimeException("not implemented");
+        Map<String, Set<String>> result = new HashMap<>();
+        for (Tweet tweet : tweets) {
+            String author = tweet.getAuthor();
+            if (result.containsKey(author)) {
+                continue;
+            }
+            result.put(author, Extract.getMentionedUsers(Filter.writtenBy(tweets, author)));
+        }
+        return result;
     }
 
     /**
@@ -54,7 +61,11 @@ public class SocialNetwork {
      *         descending order of follower count.
      */
     public static List<String> influencers(Map<String, Set<String>> followsGraph) {
-        throw new RuntimeException("not implemented");
+        Comparator<Map.Entry<String, Set<String>>> comparator = Map.Entry.comparingByValue(Comparator.comparing(Set::size));
+        return followsGraph.entrySet().stream()
+                .sorted(comparator.reversed())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 
 }

@@ -31,7 +31,8 @@ public class ExtractTest {
     private static final Tweet tweet4 = new Tweet(4, "bbitdiddle", "rivest kluio jm", d3);
     private static final Tweet tweet5 = new Tweet(5, "bbitdiddle", "rivest talk in sfdjk@mit.edu.cn 30 minutes #hype", d2);
     private static final Tweet tweet6 = new Tweet(6, "skdjfal", "I like @haha and @HAHA", d2);
-    
+    private static final Tweet tweet7 = new Tweet(7, "skdjfal", "I like @haha and @Hellen", d2);
+
     @Test(expected=AssertionError.class)
     public void testAssertionsEnabled() {
         assert false; // make sure assertions are enabled with VM argument: -ea
@@ -126,7 +127,7 @@ public class ExtractTest {
         Set<String> mentionedUsers = Extract.getMentionedUsers(Arrays.asList(tweet6));
 
         assertFalse("expected non-empty set", mentionedUsers.isEmpty());
-        assertTrue("expected same user", new HashSet<>(Arrays.asList("haha", "HAHA")).containsAll(mentionedUsers));
+        assertEquals("expected single set", 1, mentionedUsers.size());
     }
 
     // This test covers list.length()=1, not mention && contains email address
@@ -148,10 +149,10 @@ public class ExtractTest {
     // This test covers list.length()>1, mention
     @Test
     public void manyTweetAndMentionGetMentionedUsersTest() {
-        Set<String> mentionedUsers = Extract.getMentionedUsers(Arrays.asList(tweet6, tweet1));
+        Set<String> mentionedUsers = Extract.getMentionedUsers(Arrays.asList(tweet7, tweet1));
 
         assertFalse("expected non-empty set", mentionedUsers.isEmpty());
-        assertTrue("expected same user", new HashSet<>(Arrays.asList("haha", "HAHA")).containsAll(mentionedUsers));
+        assertTrue("expected same user", new HashSet<>(Arrays.asList("haha", "hellen")).containsAll(mentionedUsers));
     }
 
     // This test covers list.length()=1, not mention && contains email address

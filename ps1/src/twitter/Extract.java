@@ -75,7 +75,7 @@ public class Extract {
         for (String segmentSplitBySpace : segmentsSplitBySpace) {
             String[] segmentSplitByAt = segmentSplitBySpace.split("@");
             if (segmentSplitByAt.length == 2 && segmentSplitByAt[0].length() == 0) {
-                result.add(segmentSplitByAt[1]);
+                result.add(segmentSplitByAt[1].toLowerCase());
             }
         }
         return result;

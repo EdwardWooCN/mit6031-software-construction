@@ -5,11 +5,8 @@ package twitter;
 
 import static org.junit.Assert.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.Instant;
+import java.util.*;
 
 import org.junit.Test;
 
@@ -20,25 +17,82 @@ public class SocialNetworkTest {
      * See the ic03-testing exercise for examples of what a testing strategy comment looks like.
      * Make sure you have partitions.
      */
-    
+
+    private static final Instant d1 = Instant.parse("2016-02-17T10:00:00Z");
+    private static final Instant d2 = Instant.parse("2016-02-17T11:00:00Z");
+    private static final Instant d3 = Instant.parse("2026-02-17T01:00:00Z");
+
+    private static final Tweet tweet1 = new Tweet(1, "alyssa", "is it reasonable to talk about rivest so much?", d1);
+    private static final Tweet tweet2 = new Tweet(2, "bbitdiddle", "rivest talk in 30 minutes #hype", d2);
+    private static final Tweet tweet3 = new Tweet(3, "csdg", "sdaf kluio jm", d3);
+    private static final Tweet tweet4 = new Tweet(4, "bbitdiddle", "rivest kluio jm", d3);
+    private static final Tweet tweet5 = new Tweet(5, "bbitdiddle", "rivest talk in sfdjk@mit.edu.cn 30 minutes #hype", d2);
+    private static final Tweet tweet6 = new Tweet(6, "skdjfal", "I like @haha and @HAHA", d2);
+
     @Test(expected=AssertionError.class)
     public void testAssertionsEnabled() {
         assert false; // make sure assertions are enabled with VM argument: -ea
     }
-    
+
+    /*
+     * Testing strategy for SocialNetwork.guessFollowsGraph
+     *
+     * Partition the result as follows:
+     *  result.length(): 0, > 0
+     */
+
+    //test covers result==0
     @Test
     public void testGuessFollowsGraphEmpty() {
         Map<String, Set<String>> followsGraph = SocialNetwork.guessFollowsGraph(new ArrayList<>());
         
         assertTrue("expected empty graph", followsGraph.isEmpty());
     }
-    
+
+    //test covers result>0
+    @Test
+    public void testGuessFollowsGraphNonEmptyResult() {
+        Map<String, Set<String>> followsGraph = SocialNetwork.guessFollowsGraph(Arrays.asList(tweet6));
+        Map<String, Set<String>> expectedResult = new HashMap<>();
+        expectedResult.put("skdjfal", new HashSet<>(Arrays.asList("haha")));
+
+        assertFalse("expected non-empty graph", followsGraph.isEmpty());
+        assertEquals("expected graph nodes", followsGraph, expectedResult);
+    }
+
+    /*
+     * Testing strategy for SocialNetwork.guessFollowsGraph
+     *
+     * Partition the result as follows:
+     *  result.length(): 0, > 0
+     */
+
+    //test covers result==0
     @Test
     public void testInfluencersEmpty() {
         Map<String, Set<String>> followsGraph = new HashMap<>();
         List<String> influencers = SocialNetwork.influencers(followsGraph);
         
         assertTrue("expected empty list", influencers.isEmpty());
+    }
+
+    //test covers result>0
+    @Test
+    public void testInfluencersNonEmptyResult() {
+        Map<String, Set<String>> followsGraph = new HashMap<>();
+        followsGraph.put("user1", new HashSet<>(Arrays.asList("mentioned1")));
+        followsGraph.put("user2", new HashSet<>(Arrays.asList("mentioned1", "mentioned2")));
+        followsGraph.put("user3", new HashSet<>(Arrays.asList("mentioned3", "mentioned4")));
+        followsGraph.put("user4", new HashSet<>(Arrays.asList("mentioned1", "mentioned2", "mentioned3", "mentioned4")));
+        followsGraph.put("user5", new HashSet<>(Arrays.asList("mentioned3", "mentioned1", "mentioned2")));
+        List<String> influencers = SocialNetwork.influencers(followsGraph);
+
+        assertFalse("expected non-empty list", influencers.isEmpty());
+        assertEquals("expected in order list", 0, influencers.indexOf("user4"));
+        assertEquals("expected in order list", 1, influencers.indexOf("user5"));
+//        assertEquals("expected in order list", 2, influencers.indexOf("user2"));
+//        assertEquals("expected in order list", 3, influencers.indexOf("user3"));
+        assertEquals("expected in order list", 4, influencers.indexOf("user1"));
     }
 
     /*
