@@ -18,7 +18,6 @@ import java.util.Set;
  * @param <L> type of vertex labels in this graph, must be immutable
  */
 public interface Graph<L> {
-    
     /**
      * Create an empty graph.
      * 
