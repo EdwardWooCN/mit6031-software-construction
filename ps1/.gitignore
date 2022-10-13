@@ -1,2 +1,6 @@
 .DS_Store
 bin
+.idea
+.settings
+*.iml
+lib
