@@ -58,6 +58,7 @@ public class GraphStaticTest {
         testComprehensive(Label.class);
     }
 
+    //same as GraphInstanceTest
     private <L> void testComprehensive(Class<L> clazz) {
         //build a simple graph https://en.wikipedia.org/wiki/File:Directed_graph_no_background.svg
         Graph<L> graph = Graph.empty();
