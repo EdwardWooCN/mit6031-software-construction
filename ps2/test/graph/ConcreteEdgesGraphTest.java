@@ -21,7 +21,7 @@ public class ConcreteEdgesGraphTest extends GraphInstanceTest {
      * Provide a ConcreteEdgesGraph for tests in GraphInstanceTest.
      */
     @Override public Graph<String> emptyInstance() {
-        return new ConcreteEdgesGraph();
+        return new ConcreteEdgesGraph<>();
     }
     
     /*
@@ -62,10 +62,10 @@ public class ConcreteEdgesGraphTest extends GraphInstanceTest {
     
     // TODO tests for operations of Edge
 
-    private final Edge edge1 = new Edge(vertex1, vertex2, 2);
-    private final Edge edge2 = new Edge(vertex1, vertex2, 2);
-    private final Edge edge3 = new Edge(vertex1, vertex2, 5);
-    private final Edge edge4 = new Edge(vertex2, vertex1, 2);
+    private final Edge<String> edge1 = new Edge<>(vertex1, vertex2, 2);
+    private final Edge<String> edge2 = new Edge<>(vertex1, vertex2, 2);
+    private final Edge<String> edge3 = new Edge<>(vertex1, vertex2, 5);
+    private final Edge<String> edge4 = new Edge<>(vertex2, vertex1, 2);
 
     @Test
     public void testEqualUnweightedEdge() {

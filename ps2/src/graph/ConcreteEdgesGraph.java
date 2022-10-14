@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
  * 
  * <p>PS2 instructions: you MUST use the provided rep.
  */
-public class ConcreteEdgesGraph implements Graph<String> {
+public class ConcreteEdgesGraph<L> implements Graph<L> {
     
-    private final Set<String> vertices = new HashSet<>();
-    private final List<Edge> edges = new ArrayList<>();
+    private final Set<L> vertices = new HashSet<>();
+    private final List<Edge<L>> edges = new ArrayList<>();
     
     // Abstraction function:
     //   vertices & edges represent graph
@@ -35,15 +35,15 @@ public class ConcreteEdgesGraph implements Graph<String> {
         assert edgeSet.size() == edges.size();
 
         //sources and targets of all edges must be contained in vertices
-        Optional<Edge> unexpectedEdgeOpt = edges.stream().filter(edge -> !vertices.containsAll(Arrays.asList(edge.getSrc(), edge.getDst()))).findAny();
+        Optional<Edge<L>> unexpectedEdgeOpt = edges.stream().filter(edge -> !vertices.containsAll(Arrays.asList(edge.getSrc(), edge.getDst()))).findAny();
         assert !unexpectedEdgeOpt.isPresent();
     }
     
-    @Override public boolean add(String vertex) {
+    @Override public boolean add(L vertex) {
         return vertices.add(vertex);
     }
     
-    @Override public int set(String source, String target, int weight) {
+    @Override public int set(L source, L target, int weight) {
         int result = 0;
         int indexOfUnweightedEdge = indexOfUnweightedEdge(source, target, weight > 0 ? weight : 1);
         if (indexOfUnweightedEdge > -1) {  //change precondition or remove edge
@@ -58,7 +58,7 @@ public class ConcreteEdgesGraph implements Graph<String> {
             }
         }
         if (weight > 0) {  //change or add edge
-            edges.add(new Edge(source, target, weight));
+            edges.add(new Edge<>(source, target, weight));
             vertices.add(source);
             vertices.add(target);
         }
@@ -67,7 +67,7 @@ public class ConcreteEdgesGraph implements Graph<String> {
         return result;
     }
     
-    @Override public boolean remove(String vertex) {
+    @Override public boolean remove(L vertex) {
         boolean hasRemovedRelatedEdge = edges.removeIf(edge -> edge.getSrc().equals(vertex) || edge.getDst().equals(vertex));
         if (hasRemovedRelatedEdge) {
             vertices.remove(vertex);
@@ -77,15 +77,15 @@ public class ConcreteEdgesGraph implements Graph<String> {
         return hasRemovedRelatedEdge || hasRemoveVertices;
     }
     
-    @Override public Set<String> vertices() {
+    @Override public Set<L> vertices() {
         return new HashSet<>(vertices);
     }
     
-    @Override public Map<String, Integer> sources(String target) {
+    @Override public Map<L, Integer> sources(L target) {
         return edges.stream().filter(edge -> edge.getDst().equals(target)).collect(Collectors.toMap(Edge::getSrc, Edge::getW, (a, b) -> a));
     }
     
-    @Override public Map<String, Integer> targets(String source) {
+    @Override public Map<L, Integer> targets(L source) {
         return edges.stream().filter(edge -> edge.getSrc().equals(source)).collect(Collectors.toMap(Edge::getDst, Edge::getW, (a, b) -> a));
     }
     
@@ -94,7 +94,7 @@ public class ConcreteEdgesGraph implements Graph<String> {
         return String.format("ConcreteEdgesGraph:\nVertices:%s\nEdges:%s", vertices.toString(), edges.toString());
     }
 
-    private int indexOfUnweightedEdge(Edge edge) {
+    private int indexOfUnweightedEdge(Edge<L> edge) {
         for (int index = 0; index < edges.size(); index++) {
             if (Edge.isEqualUnweightedEdge(edges.get(index), edge)) {
                 return index;
@@ -103,8 +103,8 @@ public class ConcreteEdgesGraph implements Graph<String> {
         return -1;
     }
 
-    private int indexOfUnweightedEdge(String source, String target, int weight) {
-        return indexOfUnweightedEdge(new Edge(source, target, weight));
+    private int indexOfUnweightedEdge(L source, L target, int weight) {
+        return indexOfUnweightedEdge(new Edge<>(source, target, weight));
     }
 }
 
@@ -116,10 +116,10 @@ public class ConcreteEdgesGraph implements Graph<String> {
  * <p>PS2 instructions: the specification and implementation of this class is
  * up to you.
  */
-class Edge {
+class Edge<L> {
     
-    private final String src;
-    private final String dst;
+    private final L src;
+    private final L dst;
     private final int w;
 
     // Abstraction function:
@@ -129,7 +129,7 @@ class Edge {
     // Safety from rep exposure:
     //   immutable object
     
-    Edge(String src, String dst, int w) {
+    Edge(L src, L dst, int w) {
         // check rep
         if (Objects.isNull(src) || Objects.isNull(dst) || w <= 0) {
             throw new RuntimeException("illegal edge init");
@@ -140,11 +140,11 @@ class Edge {
         this.w = w;
     }
 
-    public String getSrc() {
+    public L getSrc() {
         return src;
     }
 
-    public String getDst() {
+    public L getDst() {
         return dst;
     }
 

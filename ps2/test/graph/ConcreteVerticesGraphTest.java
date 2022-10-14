@@ -24,7 +24,7 @@ public class ConcreteVerticesGraphTest extends GraphInstanceTest {
      * Provide a ConcreteVerticesGraph for tests in GraphInstanceTest.
      */
     @Override public Graph<String> emptyInstance() {
-        return new ConcreteVerticesGraph();
+        return new ConcreteVerticesGraph<String>();
     }
     
     /*
@@ -55,7 +55,7 @@ public class ConcreteVerticesGraphTest extends GraphInstanceTest {
     // TODO tests for operations of Vertex
     @Test
     public void testUpdateEdgeFromSource() {
-        Vertex v1 = Vertex.getInstance(vertex1);
+        Vertex<String> v1 = Vertex.getInstance(vertex1);
 
         int firstEdgeWeight = 2;
         int oldWeight = v1.updateEdgeFromSource(vertex2, firstEdgeWeight);
@@ -70,7 +70,7 @@ public class ConcreteVerticesGraphTest extends GraphInstanceTest {
 
     @Test
     public void testUpdateEdgeFromTarget() {
-        Vertex v1 = Vertex.getInstance(vertex1);
+        Vertex<String> v1 = Vertex.getInstance(vertex1);
 
         int firstEdgeWeight = 2;
         int oldWeight = v1.updateEdgeFromTarget(vertex2, firstEdgeWeight);
@@ -85,7 +85,7 @@ public class ConcreteVerticesGraphTest extends GraphInstanceTest {
 
     @Test
     public void testRemoveEdgeFromSource() {
-        Vertex v1 = Vertex.getInstance(vertex1);
+        Vertex<String> v1 = Vertex.getInstance(vertex1);
 
         int oldWeight = v1.removeEdgeFromSource(vertex2);
         assertSame("expect remove non-existed edge", 0, oldWeight);
@@ -99,7 +99,7 @@ public class ConcreteVerticesGraphTest extends GraphInstanceTest {
 
     @Test
     public void testRemoveEdgeFromTarget() {
-        Vertex v1 = Vertex.getInstance(vertex1);
+        Vertex<String> v1 = Vertex.getInstance(vertex1);
 
         int oldWeight = v1.removeEdgeFromTarget(vertex2);
         assertSame("expect remove non-existed edge", 0, oldWeight);

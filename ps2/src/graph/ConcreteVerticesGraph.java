@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
  * 
  * <p>PS2 instructions: you MUST use the provided rep.
  */
-public class ConcreteVerticesGraph implements Graph<String> {
+public class ConcreteVerticesGraph<L> implements Graph<L> {
     
-    private final List<Vertex> vertices = new ArrayList<>();
+    private final List<Vertex<L>> vertices = new ArrayList<>();
     
     // Abstraction function:
     //   Vertex represents vertices of graph and (Vertex.source -> Vertex.this) && (Vertex.this -> Vertex.target) represents edge
@@ -28,7 +28,7 @@ public class ConcreteVerticesGraph implements Graph<String> {
         assert new HashSet<Vertex>(vertices).size() == vertices().size();
     }
     
-    @Override public boolean add(String vertex) {
+    @Override public boolean add(L vertex) {
         if (Objects.nonNull(findVertexInList(vertex))) {
             checkRep();
             return false;
@@ -39,15 +39,15 @@ public class ConcreteVerticesGraph implements Graph<String> {
         return true;
     }
     
-    @Override public int set(String source, String target, int weight) {
+    @Override public int set(L source, L target, int weight) {
         //remove edge
         if (weight == 0) {
-            Vertex srcVertex = findVertexInList(source);
+            Vertex<L> srcVertex = findVertexInList(source);
             int res1 = 0;
             if (Objects.nonNull(srcVertex)) {
                 res1 = srcVertex.removeEdgeFromTarget(target);
             }
-            Vertex trgVertex = findVertexInList(target);
+            Vertex<L> trgVertex = findVertexInList(target);
             if (Objects.nonNull(trgVertex) && !source.equals(target)) {
                 int res2 = trgVertex.removeEdgeFromSource(source);
                 assert res1 == res2;
@@ -68,9 +68,9 @@ public class ConcreteVerticesGraph implements Graph<String> {
         return res1;
     }
     
-    @Override public boolean remove(String vertex) {
+    @Override public boolean remove(L vertex) {
         //remove vertex
-        Vertex removedVertex = findVertexInList(vertex);
+        Vertex<L> removedVertex = findVertexInList(vertex);
         if (Objects.isNull(removedVertex)) {
             checkRep();
             return false;
@@ -85,26 +85,26 @@ public class ConcreteVerticesGraph implements Graph<String> {
         return true;
     }
     
-    @Override public Set<String> vertices() {
+    @Override public Set<L> vertices() {
         return vertices.stream().map(Vertex::getId).collect(Collectors.toSet());
     }
     
-    @Override public Map<String, Integer> sources(String target) {
+    @Override public Map<L, Integer> sources(L target) {
         return Optional.ofNullable(findVertexInList(target)).map(Vertex::getSourceEdges).orElse(new HashMap<>());
     }
     
-    @Override public Map<String, Integer> targets(String source) {
+    @Override public Map<L, Integer> targets(L source) {
         return Optional.ofNullable(findVertexInList(source)).map(Vertex::getTargetEdges).orElse(new HashMap<>());
     }
     
-    private Vertex findVertexInList(String id) {
+    private Vertex<L> findVertexInList(L id) {
         return vertices.stream().filter(item -> item.getId().equals(id)).findAny().orElse(null);
     }
 
-    private boolean deleteVertexInList(String id) {
-        Iterator<Vertex> vertexIterator = vertices.listIterator();
+    private boolean deleteVertexInList(L id) {
+        Iterator<Vertex<L>> vertexIterator = vertices.listIterator();
         while (vertexIterator.hasNext()) {
-            Vertex vertex = vertexIterator.next();
+            Vertex<L> vertex = vertexIterator.next();
             if (vertex.getId().equals(id)) {
                 vertexIterator.remove();
                 return true;
@@ -129,14 +129,14 @@ public class ConcreteVerticesGraph implements Graph<String> {
  * <p>PS2 instructions: the specification and implementation of this class is
  * up to you.
  */
-class Vertex {
-    private final String id;
+class Vertex<L> {
+    private final L id;
 
     //key is the source of edge, target is this vertex, i.e. (source -> this, weight)
-    private final Map<String, Integer> sourceEdges = new HashMap<>();
+    private final Map<L, Integer> sourceEdges = new HashMap<>();
 
     //key is the target of edge, source is this vertex, i.e. (this -> target, weight)
-    private final Map<String, Integer> targetEdges = new HashMap<>();
+    private final Map<L, Integer> targetEdges = new HashMap<>();
 
     // Abstraction function:
     //   id is the node, (source -> this, weight) && (this -> target, weight) are edge related to this node
@@ -145,13 +145,13 @@ class Vertex {
     // Safety from rep exposure:
     //   sourcesEdge, targetsEdge use unmodifiable view
     
-    private Vertex(String id) {
+    private Vertex(L id) {
         assert Objects.nonNull(id);
         this.id = id;
     }
 
-    public static Vertex getInstance(String id) {
-        return new Vertex(id);
+    public static <L> Vertex<L> getInstance(L id) {
+        return new Vertex<>(id);
     }
 
     private void checkRep() {
@@ -159,15 +159,15 @@ class Vertex {
         assert !sourceEdges.containsKey(id);
     }
 
-    public String getId() {
+    public L getId() {
         return id;
     }
 
-    public Map<String, Integer> getSourceEdges() {
+    public Map<L, Integer> getSourceEdges() {
         return Collections.unmodifiableMap(sourceEdges);
     }
 
-    public Map<String, Integer> getTargetEdges() {
+    public Map<L, Integer> getTargetEdges() {
         return Collections.unmodifiableMap(targetEdges);
     }
 
@@ -177,7 +177,7 @@ class Vertex {
      * @param weight: edge weight, has positive value
      * @return: previous weight of this edge, zero if non-existed before
      */
-    public int updateEdgeFromSource(String source, int weight) {
+    public int updateEdgeFromSource(L source, int weight) {
         assert weight > 0 : "invalid weight";
         assert !source.equals(id) : "this node cannot be contained in sourceEdges, should be in targetEdges";
 
@@ -192,7 +192,7 @@ class Vertex {
      * @param weight: edge weight, has positive value
      * @return: previous weight of this edge, zero if non-existed before
      */
-    public int updateEdgeFromTarget(String target, int weight) {
+    public int updateEdgeFromTarget(L target, int weight) {
         assert weight > 0 : "invalid weight";
 
         Integer oldWeight = targetEdges.get(target);
@@ -205,7 +205,7 @@ class Vertex {
      * @param source: id of source vertex
      * @return: previous weight of this edge, zero if non-existed before
      */
-    public int removeEdgeFromSource(String source) {
+    public int removeEdgeFromSource(L source) {
         return Optional.ofNullable(sourceEdges.remove(source)).orElse(0);
     }
 
@@ -214,18 +214,18 @@ class Vertex {
      * @param target: id of target vertex
      * @return: previous weight of this edge, zero if non-existed before
      */
-    public int removeEdgeFromTarget(String target) {
+    public int removeEdgeFromTarget(L target) {
         return Optional.ofNullable(targetEdges.remove(target)).orElse(0);
     }
 
     @Override
     public String toString() {
-        return String.format("Vertex:\nsourcesEdge:%s\ntargetsEdge:%s", edgesExpressionOf(sourceEdges, true), edgesExpressionOf(targetEdges, false));
+        return String.format("Vertex(id: %s, sourcesEdge: %s, targetsEdge: %s)", id, edgesExpressionOf(sourceEdges, true), edgesExpressionOf(targetEdges, false));
     }
 
-    private String edgesExpressionOf(Map<String, Integer> edges, boolean isSourceEdge) {
+    private String edgesExpressionOf(Map<L, Integer> edges, boolean isSourceEdge) {
         List<String> result = new LinkedList<>();
-        for (Map.Entry<String, Integer> entry : edges.entrySet()) {
+        for (Map.Entry<L, Integer> entry : edges.entrySet()) {
             String edgeExpr;
             if (isSourceEdge) {
                 edgeExpr = edgeExpressionOf(entry.getKey(), this.id, entry.getValue());
@@ -237,7 +237,7 @@ class Vertex {
         return result.toString();
     }
 
-    private String edgeExpressionOf(String source, String target, int weight) {
+    private String edgeExpressionOf(L source, L target, int weight) {
         return String.format("Edge=(%s -> %s, weight=%d)", source, target, weight);
     }
 }
