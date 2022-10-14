@@ -205,6 +205,19 @@ public abstract class GraphInstanceTest {
     }
 
     @Test
+    public void testRepLoop() {
+        Graph<String> stringGraph = emptyInstance();
+
+        int weight = 1;
+        stringGraph.set(vertex1, vertex1, weight);
+
+        Map<String, Integer> sources = stringGraph.targets(vertex1);
+        assertTrue("expected sources==target in source side", sources.containsKey(vertex1) && sources.get(vertex1).equals(weight));
+        Map<String, Integer> targets = stringGraph.sources(vertex1);
+        assertTrue("expected sources==target in target side", targets.containsKey(vertex1) && targets.get(vertex1).equals(weight));
+    }
+
+    @Test
     public void testComprehensive() {
         //build a simple graph https://en.wikipedia.org/wiki/File:Directed_graph_no_background.svg
         Graph<String> graph = emptyInstance();

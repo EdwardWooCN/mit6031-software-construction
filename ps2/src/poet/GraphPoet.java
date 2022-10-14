@@ -4,7 +4,9 @@
 package poet;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import graph.Graph;
 
@@ -53,36 +55,153 @@ import graph.Graph;
 public class GraphPoet {
     
     private final Graph<String> graph = Graph.empty();
-    
+
+    private final CaseInsensitiveStringGraph graphHelper = new CaseInsensitiveStringGraph(graph);
+
     // Abstraction function:
-    //   TODO
+    //   vertex represents case-insensitive word
+    //   edge represents in-order adjacency count
     // Representation invariant:
-    //   TODO
+    //   every vertex uses lower case
+    //   every vertex has at least one edge
+    //   weight of every edge > 0 (ensured by ADT)
     // Safety from rep exposure:
-    //   TODO
+    //   defensive copy
     
     /**
      * Create a new poet with the graph from corpus (as described above).
      * 
      * @param corpus text file from which to derive the poet's affinity graph
-     * @throws IOException if the corpus file cannot be found or read
      */
-    public GraphPoet(File corpus) throws IOException {
-        throw new RuntimeException("not implemented");
+    public GraphPoet(File corpus) {
+        List<String> words = splitCorpus(corpus);
+        if (words.isEmpty()) {//empty file or file not found
+            return;
+        }
+
+        for (int i = 0; i < words.size() - 1; i++) {
+            String source = words.get(i), target = words.get(i+1);
+
+            int currentWeight = graphHelper.setEdge(source, target, 1);
+            graphHelper.setEdge(source, target, currentWeight + 1);
+        }
+        checkRep();
     }
-    
-    // TODO checkRep
+
+    //helper
+    public static List<String> splitCorpus(File corpus) {
+        List<String> result = new ArrayList<>();
+        try {
+            Scanner sc = new Scanner(corpus);
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] details = line.split(" ");
+                result.addAll(Arrays.asList(details));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return result.stream()
+                .filter(Objects::nonNull)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+    }
+
+    private void checkRep() {
+        Set<String> vertices = graph.vertices();
+
+        //every vertex uses lower case && has at least one edge
+        String expectNull = vertices.stream()
+                .filter(vertex -> !vertex.toLowerCase().equals(vertex) ||
+                        (graph.sources(vertex).isEmpty() && graph.targets(vertex).isEmpty()))
+                .findAny()
+                .orElse(null);
+        assert null == expectNull;
+    }
     
     /**
      * Generate a poem.
-     * 
+     *   method invariant: no change of graph
      * @param input string from which to create the poem
      * @return poem (as described above)
      */
     public String poem(String input) {
-        throw new RuntimeException("not implemented");
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String> words = Arrays.asList(input.split(" "));
+        if (words.size() <= 1) {
+            return input;
+        }
+
+        for (int i = 0; i < words.size() - 1; i++) {
+            String source = words.get(i), target = words.get(i + 1);
+            stringBuilder.append(source).append(" ");
+
+            String bridge = graphHelper.findBridge(source, target);
+            if (Objects.nonNull(bridge)) {
+                stringBuilder.append(bridge).append(" ");
+            }
+        }
+        stringBuilder.append(words.get(words.size() - 1));
+
+        checkRep();
+        return stringBuilder.toString();
     }
-    
-    // TODO toString()
-    
+
+    public String getRepString() {
+        return graph.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "GraphPoet{" +
+                "graph=" + graph +
+                '}';
+    }
+}
+
+class CaseInsensitiveStringGraph {
+    private final Graph<String> graph;
+
+    CaseInsensitiveStringGraph(Graph<String> graph) {
+        this.graph = graph;
+    }
+
+    //adaptor: use lower case string as vertex
+    public int setEdge(String source, String target, int weight) {
+        return graph.set(source.toLowerCase(), target.toLowerCase(), weight);
+    }
+
+    public Map<String, Integer> findTargets(String source) {
+        return graph.targets(source.toLowerCase());
+    }
+
+    public boolean containsAllVertices(Collection<String> input) {
+        return graph.vertices().containsAll(input.stream().map(String::toLowerCase).collect(Collectors.toList()));
+    }
+
+    //method invariant: no change of graph
+    public String findBridge(String src, String dst) {
+        String source = src.toLowerCase(), target = dst.toLowerCase();
+
+        if (!containsAllVertices(Arrays.asList(source, target))) {
+            return null;
+        }
+
+        //source -> b -> target
+        Map<String, Integer> possibleBridges = graph.targets(source);
+        SortedMap<Integer, String> bridges = new TreeMap<>(Comparator.reverseOrder());
+        for (Map.Entry<String, Integer> possibleBridgeEntry : possibleBridges.entrySet()) {
+            String possibleBridge = possibleBridgeEntry.getKey();
+            Map<String, Integer> possibleTarget = graph.targets(possibleBridge);
+            if (!possibleTarget.containsKey(target)) {
+                continue;
+            }
+            bridges.put(possibleBridgeEntry.getValue() + possibleTarget.get(target), possibleBridge);
+        }
+
+        if (bridges.isEmpty()) {
+            return null;
+        }
+        return bridges.get(bridges.firstKey());
+    }
 }
